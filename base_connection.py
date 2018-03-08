@@ -9,12 +9,12 @@ class Connection(metaclass=ABCMeta):
     
     REMEMBER that all connections to remote computers should go through the 'checkSuccess' function so that connection errors can be dealt with robustly.
 
-    The general idea is that when communicatin between computers it is often useful to be able to control them, send files to them and check how much storage space you need. If connecting to computing clusters you may also wish to be able to check the job queue.
+    The general idea is that when communicating between computers it is often useful to be able to control them, send files to them and check how much storage space you need. If connecting to computing clusters you may also wish to be able to check the job queue.
 
     MOST IMPORTANTLY whenever you make any kind of connection to the remote computer you want to make sure that the remote computer got the messge and if it didn't then you need to be able to keep retrying without overloading the remote computer with connection requests (i.e. DDoS attack).
     """
     
-    def __init__(self, remote_user_name, ssh_config_alias, path_to_key, forename_of_user, surname_of_user, user_email):
+    def __init__(self, remote_user_name, ssh_config_alias, path_to_key, forename_of_user, surname_of_user, user_email, affiliation = None):
         """
         In order to initiate this class the user must have their ssh config file set up to have their cluster connection as an alias. It is best to set this up on a secure ccomputer that you trusst and have an encryption key without a password. Details about setting up the SSH config file can be found at my website.
         
@@ -40,12 +40,17 @@ class Connection(metaclass=ABCMeta):
         self.forename_of_user = forename_of_user
         self.surename_of_user = surname_of_user
         self.user_email = user_email
+        self.affiliation = affiliation
 
     # ABSTRACT METHODS
     @abstractmethod
     def createLocalFile(self):
         # Often one will want to create files on the local computer and transfer them to the remote computer. What files and how you create them depends on the specific task and so this is left as an abstract method.
         pass
+
+    @abstractmethod
+    def createStandardSubmissionScript(self):
+        # If the remote computer is a cluster then you may need to submit jobs through a queuing system. This will act as a template for a standard job submission script but with no actual code to execute. The code to execute will be passed to the function as a list so that the child class doesn't have to keep being re-written everytime a new type of job is performed on the cluster.
 
     @abstractmethod
     def checkQueue(self):
